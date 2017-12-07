@@ -3,22 +3,6 @@
 
 # Parameters
 
-CLIENT = psu_dsm_msg_client
-SERVER = psu_dsm_msg_server
-
-SOURCES_CLNT.c = 
-SOURCES_CLNT.h = 
-SOURCES_SVC.c = 
-SOURCES_SVC.h = 
-SOURCES.x = psu_dsm_msg.x
-
-TARGETS_SVC.c = psu_dsm_msg_svc.c psu_dsm_msg_server.c psu_dsm_msg_xdr.c 
-TARGETS_CLNT.c = psu_dsm_msg_clnt.c psu_dsm_msg_client.c psu_dsm_msg_xdr.c 
-TARGETS = psu_dsm_msg.h psu_dsm_msg_xdr.c psu_dsm_msg_clnt.c psu_dsm_msg_svc.c psu_dsm_msg_client.c psu_dsm_msg_server.c
-
-OBJECTS_CLNT = $(SOURCES_CLNT.c:%.c=%.o) $(TARGETS_CLNT.c:%.c=%.o)
-OBJECTS_SVC = $(SOURCES_SVC.c:%.c=%.o) $(TARGETS_SVC.c:%.c=%.o) 
-OBJECTs_SVC += psu_dsm_msg_clnt.c psu_dsm_msg_clnt.o 
 
 # Compiler flags 
 
@@ -28,21 +12,15 @@ RPCGENFLAGS =
 
 # Targets 
 
-all : $(CLIENT) $(SERVER)
+all : server client
 
-$(TARGETS) : $(SOURCES.x) 
-	rpcgen $(RPCGENFLAGS) $(SOURCES.x)
+server: psu_dsm_msg.h psu_dsm_svc.c psu_dsm_server.c psu_dsm_clnt.c psu_dsm_xdr.c util.c util.h
+	gcc -o server psu_dsm_svc.c psu_dsm_server.c psu_dsm_clnt.c psu_dsm_xdr.c util.c -lnsl -lrt
 
-$(OBJECTS_CLNT) : $(SOURCES_CLNT.c) $(SOURCES_CLNT.h) $(TARGETS_CLNT.c) 
+client: psu_dsm_msg.h psu_dsm_server.c psu_dsm.c psu_dsm_clnt.c psu_dsm_xdr.c util.c util.h
+	gcc -o client psu_dsm_server.c psu_dsm.c psu_dsm_clnt.c psu_dsm_xdr.c util.c -lnsl -lrt
 
-$(OBJECTS_SVC) : $(SOURCES_SVC.c) $(SOURCES_SVC.h) $(TARGETS_SVC.c) 
-
-$(CLIENT) : $(OBJECTS_CLNT) 
-	$(LINK.c) -o $(CLIENT) $(OBJECTS_CLNT) $(LDLIBS) 
-
-$(SERVER) : $(OBJECTS_SVC) 
-	$(LINK.c) -o $(SERVER) $(OBJECTS_SVC) $(LDLIBS)
 
  clean:
-	 $(RM) core $(TARGETS) $(OBJECTS_CLNT) $(OBJECTS_SVC) $(CLIENT) $(SERVER)
+	rm server client
 

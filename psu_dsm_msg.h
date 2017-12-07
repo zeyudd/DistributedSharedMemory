@@ -83,7 +83,7 @@ extern server_t server[MAXSERV];
 enum state{NA, RO, RW};
 
 struct dirent_t{
-	char name[MAXNAME];
+	pageid_t page;
 	int pbits[MAXSERV];
 	enum state stat;
 	pthread_mutex_t lock;	
@@ -93,7 +93,7 @@ typedef struct dirent_t dirent_t;
 
 struct dir_t{
 	dirent_t dirent;
-	dirent_t *next;
+	struct dir_t *next;
 };
 
 typedef struct dir_t dir_t;
