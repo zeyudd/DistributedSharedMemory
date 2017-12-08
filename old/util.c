@@ -5,7 +5,7 @@
 #include <net/if.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-#include "psu_dsm_msg.h"
+
 
 unsigned long
 hash(unsigned char *str)
@@ -19,7 +19,7 @@ hash(unsigned char *str)
     return hash;
 }
 
-void get_local_ipaddr(char ip[IP_LEN])
+char* get_local_ip_addr()
 {
 	int fd;	
 	struct ifreq ifr;
@@ -36,6 +36,6 @@ void get_local_ipaddr(char ip[IP_LEN])
                        
     	close(fd);
     
-     	strncpy(ip, inet_ntoa(( (struct sockaddr_in *)&ifr.ifr_addr )->sin_addr), IP_LEN);
+     	return inet_ntoa(( (struct sockaddr_in *)&ifr.ifr_addr )->sin_addr);
  }
 

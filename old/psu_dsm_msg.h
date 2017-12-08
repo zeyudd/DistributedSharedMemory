@@ -7,42 +7,28 @@
 #define _PSU_DSM_MSG_H_RPCGEN
 
 #include <rpc/rpc.h>
-
+#include <pthread.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define PAGE_SIZE 4096
-#define NAME_LEN 32
-#define IP_LEN 16
+#define PAGESIZE 4096
+#define MAXNAME 32
 
 struct page_t {
 	u_int size;
-	char addr[PAGE_SIZE];
+	char addr[PAGESIZE];
 };
 typedef struct page_t page_t;
 
 struct pageid_t {
-	char name[NAME_LEN];
+	char name[MAXNAME];
 	u_int size;
 };
 typedef struct pageid_t pageid_t;
 
-struct request_t {
-	pageid_t pageid;
-	mode_t mode;
-};
-typedef struct request_t request_t;
-
-enum mode_t {
-	NA = 0,
-	RO = 1,
-	RW = 2,
-};
-typedef enum mode_t mode_t;
-
-#define PSU_DSM 0x20002234
+#define PSU_DSM 0x20002222
 #define PSU_DSM_VERS 1
 
 #if defined(__STDC__) || defined(__cplusplus)
@@ -53,17 +39,11 @@ extern  int * psu_dsm_page_find_1_svc(pageid_t *, struct svc_req *);
 extern  int * psu_dsm_page_creat_1(pageid_t *, CLIENT *);
 extern  int * psu_dsm_page_creat_1_svc(pageid_t *, struct svc_req *);
 #define PSU_DSM_PAGE_UPDATE 3
-extern  int * psu_dsm_page_update_1(request_t *, CLIENT *);
-extern  int * psu_dsm_page_update_1_svc(request_t *, struct svc_req *);
-#define PSU_DSM_PAGE_REQUEST 4
-extern  page_t * psu_dsm_page_request_1(request_t *, CLIENT *);
-extern  page_t * psu_dsm_page_request_1_svc(request_t *, struct svc_req *);
-#define PSU_DSM_PAGE_FETCH 5
-extern  page_t * psu_dsm_page_fetch_1(request_t *, CLIENT *);
-extern  page_t * psu_dsm_page_fetch_1_svc(request_t *, struct svc_req *);
-#define PSU_DSM_PAGE_ACK 6
-extern  void * psu_dsm_page_ack_1(pageid_t *, CLIENT *);
-extern  void * psu_dsm_page_ack_1_svc(pageid_t *, struct svc_req *);
+extern  int * psu_dsm_page_update_1(pageid_t *, CLIENT *);
+extern  int * psu_dsm_page_update_1_svc(pageid_t *, struct svc_req *);
+#define PSU_DSM_PAGE_FETCH 4
+extern  page_t * psu_dsm_page_fetch_1(pageid_t *, CLIENT *);
+extern  page_t * psu_dsm_page_fetch_1_svc(pageid_t *, struct svc_req *);
 extern int psu_dsm_1_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
 
 #else /* K&R C */
@@ -76,15 +56,9 @@ extern  int * psu_dsm_page_creat_1_svc();
 #define PSU_DSM_PAGE_UPDATE 3
 extern  int * psu_dsm_page_update_1();
 extern  int * psu_dsm_page_update_1_svc();
-#define PSU_DSM_PAGE_REQUEST 4
-extern  page_t * psu_dsm_page_request_1();
-extern  page_t * psu_dsm_page_request_1_svc();
-#define PSU_DSM_PAGE_FETCH 5
+#define PSU_DSM_PAGE_FETCH 4
 extern  page_t * psu_dsm_page_fetch_1();
 extern  page_t * psu_dsm_page_fetch_1_svc();
-#define PSU_DSM_PAGE_ACK 6
-extern  void * psu_dsm_page_ack_1();
-extern  void * psu_dsm_page_ack_1_svc();
 extern int psu_dsm_1_freeresult ();
 #endif /* K&R C */
 
@@ -93,17 +67,40 @@ extern int psu_dsm_1_freeresult ();
 #if defined(__STDC__) || defined(__cplusplus)
 extern  bool_t xdr_page_t (XDR *, page_t*);
 extern  bool_t xdr_pageid_t (XDR *, pageid_t*);
-extern  bool_t xdr_request_t (XDR *, request_t*);
-extern  bool_t xdr_mode_t (XDR *, mode_t*);
 
 #else /* K&R C */
 extern bool_t xdr_page_t ();
 extern bool_t xdr_pageid_t ();
-extern bool_t xdr_request_t ();
-extern bool_t xdr_mode_t ();
 
 #endif /* K&R C */
 
+/* server info */
+#define MAXSERV 100
+typedef char server_t[16];
+extern int nserver;
+extern server_t server[MAXSERV];
+
+enum state{NA, RO, RW};
+
+struct dirent_t{
+	pageid_t page;
+	int pbits[MAXSERV];
+	enum state stat;
+	pthread_mutex_t lock;	
+};
+
+typedef struct dirent_t dirent_t;
+
+struct dir_t{
+	dirent_t dirent;
+	struct dir_t *next;
+};
+
+typedef struct dir_t dir_t;
+
+extern dir_t *dir;
+
+ 
 #ifdef __cplusplus
 }
 #endif

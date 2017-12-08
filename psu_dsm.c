@@ -23,30 +23,48 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include "psu_dsm_msg.h"
+#include "psu_dsm_msg_svc.h"
 #include "util.h"
 #include "psu_dsm.h"
 
-struct dsm_entry {
-	char name[MAXNAME];
-	size_t size;
-	void *addr;
-};
+void segv_handler (int signum, siginfo_t *info, void *ucontext)
+{
+	printf("Recieved signal %d\n", signum);
+	printf("ucontext = %p\n", ucontext);
+//	printf("dsm.addr = %p\n", dsm.addr);
+	printf("fault addr = %p\n", info->si_addr);
+	if( ((ucontext_t *)ucontext)->uc_mcontext.gregs[REG_ERR] & 0x2){
+		// write fault
+		printf("\nwrite fault\n");
+	}
+	else{
+		//read fault
+		printf("\nwrite fault\n");
+	}
+	
+//	mprotect (dsm.addr, PAGESIZE, PROT_READ | PROT_WRITE); 
+}
 
-typedef struct dsm_entry dsm_entry;
-
-dsm_entry dsm;
-
+/* Install segv_handler as the handler for SIGSEGV. */
+void psu_dsm_init(){
+	int fd;
+	struct sigaction sa;
+ 	memset (&sa, 0, sizeof (sa));
+ 	sa.sa_sigaction = &segv_handler;
+	sa.sa_flags = SA_SIGINFO;
+ 	sigaction (SIGSEGV, &sa, NULL);
+}
 
 
 psu_dsm_ptr_t
-psu_dsm_malloc(char *name, size_t size){
+psu_dsm_malloc(char *name, int size){
 	pageid_t page;
-	strncpy(page.name, name, MAXNAME);
+	strncpy(page.name, name, NAME_LEN);
 	page.size = size;
 
 	CLIENT *clnt;
 	int  *result_1;
-	char *host = get_local_ip_addr();
+	char *host;// = get_local_ipaddr();
 	clnt = clnt_create (host, PSU_DSM, PSU_DSM_VERS, "tcp");
 	if (clnt == NULL) {
 		printf("ERROR_HOST\n");
@@ -88,119 +106,23 @@ psu_dsm_malloc(char *name, size_t size){
 
 	key = hash(name);
 	printf("key = %d\n", key);	
-	shmid = shmget(key, PAGESIZE, 0644 | IPC_CREAT);
+	shmid = shmget(key, PAGE_SIZE, 0644 | IPC_CREAT);
 
 	if(shmid == -1){
 		perror("shmget\n");
 		exit(1);
 	}
 
-	dsm.addr = shmat(shmid, (void *)0, 0);
-	if(dsm.addr == (char *)(-1)){
-		perror("shmat\n");
-		exit(1);
-	}
- 	mprotect (dsm.addr, PAGESIZE, PROT_NONE);
+	//dsm.addr = shmat(shmid, (void *)0, 0);
+	//if(dsm.addr == (char *)(-1)){
+//		perror("shmat\n");
+//		exit(1);
+//	}
+ 	//mprotect (dsm.addr, PAGESIZE, PROT_NONE);
 	
-	dsm.size = size;
-	strncpy(dsm.name, name, MAXNAME);
-	return dsm.addr;
+	//dsm.size = size;
+	//strncpy(dsm.name, name, NAME_LEN);
+	//return dsm.addr;
 
 }
 
-void segv_handler (int signal_number) 
-{
-	 printf ("memory accessed!\n");
-	 mprotect (dsm.addr, PAGESIZE, PROT_READ | PROT_WRITE);
-} 
-
-void segv_handler2 (int signum, siginfo_t *info, void *ucontext)
-{
-	printf("Recieved signal %d\n", signum);
-	printf("ucontext = %p\n", ucontext);
-	printf("dsm.addr = %p\n", dsm.addr);
-	printf("fault addr = %p\n", info->si_addr);
-	if( ((ucontext_t *)ucontext)->uc_mcontext.gregs[REG_ERR] & 0x2){
-		// write fault
-		printf("\nwrite fault\n");
-	}
-	else{
-		//read fault
-		printf("\nwrite fault\n");
-	}
-	
-
-	mprotect (dsm.addr, PAGESIZE, PROT_READ | PROT_WRITE);
- 
-}
-
-int
-main (int argc, char *argv[])
-{	
-	int fd;
-	struct sigaction sa;
-
- /* Install segv_handler as the handler for SIGSEGV. */
- 	memset (&sa, 0, sizeof (sa));
- 	sa.sa_sigaction = &segv_handler2;
-	sa.sa_flags = SA_SIGINFO;
- 	sigaction (SIGSEGV, &sa, NULL);
- 
-
-//	char host[16];
-//	strncpy(host, get_local_ip_addr(), 16);
-
-//	char host1[16];
-//	strncpy(host1, "130.203.16.29", 16);
-	psu_dsm_ptr_t ptr;
-/*	if(strncmp(host, host1, 16) == 0){
-		printf("machine 1\n");
-		ptr = psu_dsm_malloc("hello1", 100);
-	}
-	else{	
-		printf("machine 2\n");	
-		ptr = psu_dsm_malloc("world", 100);
-	}
-*/
-
-	ptr = psu_dsm_malloc("hello", 100);
-	
-	char c = *((char *)ptr + 1);
-	
-	//strncpy(ptr, "PLEASE", 10);
-//	*((char *)ptr) = 'H';
-	
-//	*((char *)ptr + 1) = '\0';
-	
-	printf("content = %s", ptr);
-	exit (0);
-}
-
-#if 0
-int main1()
-{
- int fd;
- struct sigaction sa;
-
- /* Install segv_handler as the handler for SIGSEGV. */
- memset (&sa, 0, sizeof (sa));
- sa.sa_handler = &segv_handler;
- sigaction (SIGSEGV, &sa, NULL);
- char *memory; 
- /* Allocate one page of memory by mapping /dev/zero. Map the memory
- *    as write-only, initially. */
- fd = open ("/dev/zero", O_RDONLY);
- memory = mmap (NULL, PAGESIZE, PROT_WRITE, MAP_PRIVATE, fd, 0);
- close (fd);
- /* Write to the page to obtain a private copy. */
- /* Make the memory unwritable. */
- mprotect (memory, PAGESIZE, PROT_NONE);
-
- /* Write to the allocated memory region. */
-
- /* All done; unmap the memory. */
- printf ("all done\n");
- munmap (memory, PAGESIZE);
- return 0;
-}
-#endif

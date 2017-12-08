@@ -3,8 +3,8 @@
  * It was generated using rpcgen.
  */
 
-#ifndef _PSU_DSM_MSG_H_RPCGEN
-#define _PSU_DSM_MSG_H_RPCGEN
+#ifndef _MSG_H_RPCGEN
+#define _MSG_H_RPCGEN
 
 #include <rpc/rpc.h>
 
@@ -50,8 +50,8 @@ typedef enum mode_t mode_t;
 extern  int * psu_dsm_page_find_1(pageid_t *, CLIENT *);
 extern  int * psu_dsm_page_find_1_svc(pageid_t *, struct svc_req *);
 #define PSU_DSM_PAGE_CREAT 2
-extern  int * psu_dsm_page_creat_1(pageid_t *, CLIENT *);
-extern  int * psu_dsm_page_creat_1_svc(pageid_t *, struct svc_req *);
+extern  int * psu_dsm_page_creat_1(page_id *, CLIENT *);
+extern  int * psu_dsm_page_creat_1_svc(page_id *, struct svc_req *);
 #define PSU_DSM_PAGE_UPDATE 3
 extern  int * psu_dsm_page_update_1(request_t *, CLIENT *);
 extern  int * psu_dsm_page_update_1_svc(request_t *, struct svc_req *);
@@ -108,4 +108,4 @@ extern bool_t xdr_mode_t ();
 }
 #endif
 
-#endif /* !_PSU_DSM_MSG_H_RPCGEN */
+#endif /* !_MSG_H_RPCGEN */
