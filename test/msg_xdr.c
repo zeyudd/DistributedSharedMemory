@@ -38,9 +38,13 @@ xdr_request_t (XDR *xdrs, request_t *objp)
 {
 	register int32_t *buf;
 
+	int i;
 	 if (!xdr_pageid_t (xdrs, &objp->pageid))
 		 return FALSE;
 	 if (!xdr_mode_t (xdrs, &objp->mode))
+		 return FALSE;
+	 if (!xdr_vector (xdrs, (char *)objp->from, IP_LEN,
+		sizeof (char), (xdrproc_t) xdr_char))
 		 return FALSE;
 	return TRUE;
 }

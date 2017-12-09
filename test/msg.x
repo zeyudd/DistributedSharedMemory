@@ -15,6 +15,7 @@ struct pageid_t{
 struct request_t{
 	pageid_t pageid;
 	mode_t mode;
+	char from[IP_LEN];
 };
 
 enum mode_t{NA, RO, RW};
@@ -23,10 +24,11 @@ enum mode_t{NA, RO, RW};
 program PSU_DSM {
     version PSU_DSM_VERS {
         int PSU_DSM_PAGE_FIND(pageid_t ) = 1;
-	int PSU_DSM_PAGE_CREAT(pageid_t) = 2;
-	int PSU_DSM_PAGE_UPDATE(request_t) = 3;
-	page_t PSU_DSM_PAGE_REQUEST(request_t) = 4;
-	page_t PSU_DSM_PAGE_FETCH(request_t) = 5;
-	void PSU_DSM_PAGE_ACK(pageid_t) = 6;
+	int PSU_DSM_PAGE_LOCATE(pageit_T) = 2;
+	int PSU_DSM_PAGE_CREAT(pageid_t) = 3;
+	int PSU_DSM_PAGE_UPDATE(request_t) = 4;
+	page_t PSU_DSM_PAGE_REQUEST(request_t) = 5;
+	page_t PSU_DSM_PAGE_FETCH(request_t) = 6;
+	void PSU_DSM_PAGE_ACK(pageid_t) = 7;
     } = 1;
 } = 0x20002234;

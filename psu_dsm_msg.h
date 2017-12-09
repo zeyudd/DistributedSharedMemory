@@ -32,6 +32,7 @@ typedef struct pageid_t pageid_t;
 struct request_t {
 	pageid_t pageid;
 	mode_t mode;
+	char from[IP_LEN];
 };
 typedef struct request_t request_t;
 
@@ -49,19 +50,22 @@ typedef enum mode_t mode_t;
 #define PSU_DSM_PAGE_FIND 1
 extern  int * psu_dsm_page_find_1(pageid_t *, CLIENT *);
 extern  int * psu_dsm_page_find_1_svc(pageid_t *, struct svc_req *);
-#define PSU_DSM_PAGE_CREAT 2
+#define PSU_DSM_PAGE_LOCATE 2
+extern  int * psu_dsm_page_locate_1(pageid_t *, CLIENT *);
+extern  int * psu_dsm_page_locate_1_svc(pageid_t *, struct svc_req *);
+#define PSU_DSM_PAGE_CREAT 3
 extern  int * psu_dsm_page_creat_1(pageid_t *, CLIENT *);
 extern  int * psu_dsm_page_creat_1_svc(pageid_t *, struct svc_req *);
-#define PSU_DSM_PAGE_UPDATE 3
+#define PSU_DSM_PAGE_UPDATE 4
 extern  int * psu_dsm_page_update_1(request_t *, CLIENT *);
 extern  int * psu_dsm_page_update_1_svc(request_t *, struct svc_req *);
-#define PSU_DSM_PAGE_REQUEST 4
+#define PSU_DSM_PAGE_REQUEST 5
 extern  page_t * psu_dsm_page_request_1(request_t *, CLIENT *);
 extern  page_t * psu_dsm_page_request_1_svc(request_t *, struct svc_req *);
-#define PSU_DSM_PAGE_FETCH 5
+#define PSU_DSM_PAGE_FETCH 6
 extern  page_t * psu_dsm_page_fetch_1(request_t *, CLIENT *);
 extern  page_t * psu_dsm_page_fetch_1_svc(request_t *, struct svc_req *);
-#define PSU_DSM_PAGE_ACK 6
+#define PSU_DSM_PAGE_ACK 7
 extern  void * psu_dsm_page_ack_1(pageid_t *, CLIENT *);
 extern  void * psu_dsm_page_ack_1_svc(pageid_t *, struct svc_req *);
 extern int psu_dsm_1_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
@@ -70,19 +74,22 @@ extern int psu_dsm_1_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
 #define PSU_DSM_PAGE_FIND 1
 extern  int * psu_dsm_page_find_1();
 extern  int * psu_dsm_page_find_1_svc();
-#define PSU_DSM_PAGE_CREAT 2
+#define PSU_DSM_PAGE_LOCATE 2
+extern  int * psu_dsm_page_locate_1();
+extern  int * psu_dsm_page_locate_1_svc();
+#define PSU_DSM_PAGE_CREAT 3
 extern  int * psu_dsm_page_creat_1();
 extern  int * psu_dsm_page_creat_1_svc();
-#define PSU_DSM_PAGE_UPDATE 3
+#define PSU_DSM_PAGE_UPDATE 4
 extern  int * psu_dsm_page_update_1();
 extern  int * psu_dsm_page_update_1_svc();
-#define PSU_DSM_PAGE_REQUEST 4
+#define PSU_DSM_PAGE_REQUEST 5
 extern  page_t * psu_dsm_page_request_1();
 extern  page_t * psu_dsm_page_request_1_svc();
-#define PSU_DSM_PAGE_FETCH 5
+#define PSU_DSM_PAGE_FETCH 6
 extern  page_t * psu_dsm_page_fetch_1();
 extern  page_t * psu_dsm_page_fetch_1_svc();
-#define PSU_DSM_PAGE_ACK 6
+#define PSU_DSM_PAGE_ACK 7
 extern  void * psu_dsm_page_ack_1();
 extern  void * psu_dsm_page_ack_1_svc();
 extern int psu_dsm_1_freeresult ();

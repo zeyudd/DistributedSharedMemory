@@ -21,7 +21,8 @@ psu_dsm_1(struct svc_req *rqstp, register SVCXPRT *transp)
 {
 	union {
 		pageid_t psu_dsm_page_find_1_arg;
-		page_id psu_dsm_page_creat_1_arg;
+		pageit_T psu_dsm_page_locate_1_arg;
+		pageid_t psu_dsm_page_creat_1_arg;
 		request_t psu_dsm_page_update_1_arg;
 		request_t psu_dsm_page_request_1_arg;
 		request_t psu_dsm_page_fetch_1_arg;
@@ -42,8 +43,14 @@ psu_dsm_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		local = (char *(*)(char *, struct svc_req *)) psu_dsm_page_find_1_svc;
 		break;
 
+	case PSU_DSM_PAGE_LOCATE:
+		_xdr_argument = (xdrproc_t) xdr_pageit_T;
+		_xdr_result = (xdrproc_t) xdr_int;
+		local = (char *(*)(char *, struct svc_req *)) psu_dsm_page_locate_1_svc;
+		break;
+
 	case PSU_DSM_PAGE_CREAT:
-		_xdr_argument = (xdrproc_t) xdr_page_id;
+		_xdr_argument = (xdrproc_t) xdr_pageid_t;
 		_xdr_result = (xdrproc_t) xdr_int;
 		local = (char *(*)(char *, struct svc_req *)) psu_dsm_page_creat_1_svc;
 		break;

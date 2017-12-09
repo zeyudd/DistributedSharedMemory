@@ -3,6 +3,10 @@
 
 #define MAX_SERV 40
 #include <pthread.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/mman.h>
 
 typedef char serverid_t[IP_LEN];
 extern unsigned int nserver;
@@ -10,7 +14,7 @@ extern serverid_t server[MAX_SERV];
 
 struct dir_entry_t{
 	pageid_t page;
-	int pbits[MAX_SERV];
+	mode_t pbits[MAX_SERV];
 	mode_t mode;
 	pthread_mutex_t lock;
 };
@@ -29,6 +33,7 @@ extern dir_t *dir;
 
 struct dsm_entry_t{
 	pageid_t page;
+	void * addr;
 	serverid_t where;
 };
 

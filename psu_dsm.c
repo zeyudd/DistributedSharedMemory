@@ -58,13 +58,16 @@ void psu_dsm_init(){
 
 psu_dsm_ptr_t
 psu_dsm_malloc(char *name, int size){
+
 	pageid_t page;
 	strncpy(page.name, name, NAME_LEN);
 	page.size = size;
 
 	CLIENT *clnt;
 	int  *result_1;
-	char *host;// = get_local_ipaddr();
+	char host[IP_LEN];
+	get_local_ipaddr(host);
+
 	clnt = clnt_create (host, PSU_DSM, PSU_DSM_VERS, "tcp");
 	if (clnt == NULL) {
 		printf("ERROR_HOST\n");
@@ -82,7 +85,31 @@ psu_dsm_malloc(char *name, int size){
 	clnt_destroy (clnt);
 #endif	 /* DEBUG */
 
+	if(*result_1 != 1){
+		perror("creat failed");
+		exit(1);
+	}
+
 	
+	key_t key;
+	int shmid;
+
+	key = hash(name);
+	shmid = shmget(key, PAGE_SIZE, 0666);
+
+	if(shmid == -1){
+		perror("shmget\n");
+		exit(1);
+	}
+
+	void *addr = shmat(shmid, (void *)0, 0);
+	return addr;
+
+	
+
+
+// use shmget to get pointer
+#if 0	
    	if(*result_1 != 1){
 		perror("dsm_malloc failed!\n");
 		exit(1);
@@ -123,6 +150,6 @@ psu_dsm_malloc(char *name, int size){
 	//dsm.size = size;
 	//strncpy(dsm.name, name, NAME_LEN);
 	//return dsm.addr;
-
+#endif
 }
 

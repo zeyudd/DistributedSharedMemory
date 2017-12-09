@@ -19,7 +19,19 @@ psu_dsm_page_find_1_svc(pageid_t *argp, struct svc_req *rqstp)
 }
 
 int *
-psu_dsm_page_creat_1_svc(page_id *argp, struct svc_req *rqstp)
+psu_dsm_page_locate_1_svc(pageit_T *argp, struct svc_req *rqstp)
+{
+	static int  result;
+
+	/*
+	 * insert server code here
+	 */
+
+	return &result;
+}
+
+int *
+psu_dsm_page_creat_1_svc(pageid_t *argp, struct svc_req *rqstp)
 {
 	static int  result;
 

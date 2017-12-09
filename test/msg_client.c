@@ -14,14 +14,16 @@ psu_dsm_1(char *host)
 	int  *result_1;
 	pageid_t  psu_dsm_page_find_1_arg;
 	int  *result_2;
-	page_id  psu_dsm_page_creat_1_arg;
+	pageit_T  psu_dsm_page_locate_1_arg;
 	int  *result_3;
+	pageid_t  psu_dsm_page_creat_1_arg;
+	int  *result_4;
 	request_t  psu_dsm_page_update_1_arg;
-	page_t  *result_4;
-	request_t  psu_dsm_page_request_1_arg;
 	page_t  *result_5;
+	request_t  psu_dsm_page_request_1_arg;
+	page_t  *result_6;
 	request_t  psu_dsm_page_fetch_1_arg;
-	void  *result_6;
+	void  *result_7;
 	pageid_t  psu_dsm_page_ack_1_arg;
 
 #ifndef	DEBUG
@@ -36,24 +38,28 @@ psu_dsm_1(char *host)
 	if (result_1 == (int *) NULL) {
 		clnt_perror (clnt, "call failed");
 	}
-	result_2 = psu_dsm_page_creat_1(&psu_dsm_page_creat_1_arg, clnt);
+	result_2 = psu_dsm_page_locate_1(&psu_dsm_page_locate_1_arg, clnt);
 	if (result_2 == (int *) NULL) {
 		clnt_perror (clnt, "call failed");
 	}
-	result_3 = psu_dsm_page_update_1(&psu_dsm_page_update_1_arg, clnt);
+	result_3 = psu_dsm_page_creat_1(&psu_dsm_page_creat_1_arg, clnt);
 	if (result_3 == (int *) NULL) {
 		clnt_perror (clnt, "call failed");
 	}
-	result_4 = psu_dsm_page_request_1(&psu_dsm_page_request_1_arg, clnt);
-	if (result_4 == (page_t *) NULL) {
+	result_4 = psu_dsm_page_update_1(&psu_dsm_page_update_1_arg, clnt);
+	if (result_4 == (int *) NULL) {
 		clnt_perror (clnt, "call failed");
 	}
-	result_5 = psu_dsm_page_fetch_1(&psu_dsm_page_fetch_1_arg, clnt);
+	result_5 = psu_dsm_page_request_1(&psu_dsm_page_request_1_arg, clnt);
 	if (result_5 == (page_t *) NULL) {
 		clnt_perror (clnt, "call failed");
 	}
-	result_6 = psu_dsm_page_ack_1(&psu_dsm_page_ack_1_arg, clnt);
-	if (result_6 == (void *) NULL) {
+	result_6 = psu_dsm_page_fetch_1(&psu_dsm_page_fetch_1_arg, clnt);
+	if (result_6 == (page_t *) NULL) {
+		clnt_perror (clnt, "call failed");
+	}
+	result_7 = psu_dsm_page_ack_1(&psu_dsm_page_ack_1_arg, clnt);
+	if (result_7 == (void *) NULL) {
 		clnt_perror (clnt, "call failed");
 	}
 #ifndef	DEBUG

@@ -21,7 +21,7 @@ main (int argc, char *argv[])
 	}
 */
 
-//	ptr = psu_dsm_malloc("hello", 100);
+	ptr = psu_dsm_malloc("hello", 100);
 	
 //	char c = *((char *)ptr + 1);
 	
@@ -30,10 +30,8 @@ main (int argc, char *argv[])
 	
 //	*((char *)ptr + 1) = '\0';
 	
-//	printf("content = %s", ptr);
-
-	int *p = 0;
-	*p = 1;
+//	printf("content = %s", ptr);	:wq
+//
 
 	return 0;
 	
