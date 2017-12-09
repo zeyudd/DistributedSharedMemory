@@ -13,137 +13,11 @@ serverid_t server[MAX_SERV];
 dir_t *dir;
 dsm_t *dsm;
 
-// search if page is inside local dir
-// return 1 if found, 0 if not found
-static dir_t*
-search_dir(pageid_t page)
-{
-	dir_t *p = dir;
-	while(p != NULL){
-		if(strncmp(p->entry.page.name, page.name, NAME_LEN) == 0){
-			return p;
-		}
-		p = p->next;
-      	}
-	return NULL;
-}
-
-static int
-print_dir()
-{
-	dir_t *p = dir;
-	printf("dir = \n");
-	while(p != NULL){
-		printf("host %s\n", p->entry.page.name);
-		p = p->next;
-      	}
-}
-// insert a page into local dir
-// return 1 if success, 0 if fail
-static int
-insert_dir(dir_entry_t entry)
-{
-	printf("insert_dir called.\n");
-	dir_t *p = dir;
-	dir_t *pp = dir;
-	while(p != NULL){
-		pp = p;
-		p = p->next;	
-      	}
-
-	dir_t *new = malloc(sizeof(dir_t));
-	if(new == NULL){
-		perror("malloc");
-		exit(1);
-	}
-	
-	strncpy(new->entry.page.name, entry.page.name, NAME_LEN);
-	new->entry.page.size = entry.page.size;
-	int i;
-	for(i = 0; i < MAX_SERV; i++){
-		new->entry.pbits[i] = entry.pbits[i];
-	}
-	new->entry.mode = entry.mode;
-
-	new->next = NULL;
-
-	if(pp == NULL)
-		dir = new;
-	else
-		pp->next = new;
-}
-
-static dsm_t*
-search_dsm(pageid_t page)
-{
-	dsm_t *p = dsm;
-	while(p != NULL){
-		if(strncmp(p->entry.page.name, page.name, NAME_LEN) == 0){
-			return p;
-		}
-		p = p->next;
-      	}
-	return NULL;
-}
-
-static int
-print_dsm()
-{
-	dsm_t *p = dsm;
-	printf("dsm = \n");
-	while(p != NULL){
-		printf("host %s\n", p->entry.page.name);
-		p = p->next;
-      	}
-}
-// insert a page into local dir
-// return 1 if success, 0 if fail
-static void
-insert_dsm(pageid_t page, char where[IP_LEN])
-{
-	printf("insert_dir called.\n");
-	dsm_t *p = dsm;
-	dsm_t *pp = dsm;
-	while(p != NULL){
-		pp = p;
-		p = p->next;	
-      	}
-
-	dsm_t *new = malloc(sizeof(dsm_t));
-	if(new == NULL){
-		perror("malloc");
-		exit(1);
-	}
-	
-	strncpy(new->entry.page.name, page.name, NAME_LEN);
-	new->entry.page.size = page.size;
-	strncpy(new->entry.where, where, IP_LEN);
-	
-	if(pp == NULL){
-		dsm = new;
-	}
-	else{
-		pp->next = new;
-	}
-}
-
-static int
-get_server_id(char host[IP_LEN])
-{
-	int i;
-	for(i = 0; i < MAX_SERV; i++){
-		if(strncmp(server[i], host, IP_LEN) == 0)
-		return i;
-	} 
-	return -1;
-}
-
-
 int *
 psu_dsm_page_find_1_svc(pageid_t *argp, struct svc_req *rqstp)
 {
 	static int  result;
-	if(search_dir(*argp) == NULL)
+	if(search_dir(*argp, dir) == NULL)
 		result = 0;
 	else
 		result = 1;
@@ -151,10 +25,10 @@ psu_dsm_page_find_1_svc(pageid_t *argp, struct svc_req *rqstp)
 	return &result;
 }
 
-int *
+host_t *
 psu_dsm_page_locate_1_svc(pageid_t *argp, struct svc_req *rqstp)
 {
-	static int  result;
+	static host_t  result;
 	
 
 	int i;
@@ -167,8 +41,8 @@ psu_dsm_page_locate_1_svc(pageid_t *argp, struct svc_req *rqstp)
 	pageid = *argp;
 		
 	//search local dir
-	if(search_dir(pageid) == NULL){
-		result = 1;
+	if(search_dir(pageid, dir) == NULL){
+		strncpy(result.ip, local_host, IP_LEN);
 		return &result;
 	}
 	
@@ -191,14 +65,14 @@ psu_dsm_page_locate_1_svc(pageid_t *argp, struct svc_req *rqstp)
 
 			clnt_destroy (clnt);
 			if(*result_1 == 1){
-				result = 1;
+				strncpy(result.ip, server[i], IP_LEN);
     				return &result;
 			}
 		}
 	}
 
 	// page doesn't exist, create on local server.
-	result = 0;
+	strncpy(result.ip, "", IP_LEN);
 	return &result;
 }
 
@@ -220,7 +94,7 @@ psu_dsm_page_creat_1_svc(pageid_t *argp, struct svc_req *rqstp)
 	pageid = *argp;
 		
 	//search local dir
-	if(search_dir(pageid) != NULL){
+	if(search_dir(pageid, dir) != NULL){
 
 		request_t req;
 		req.pageid = pageid;
@@ -257,7 +131,7 @@ psu_dsm_page_creat_1_svc(pageid_t *argp, struct svc_req *rqstp)
 		mprotect(addr, PAGE_SIZE, PROT_WRITE);
 		memcpy(addr, result_1, PAGE_SIZE);
 		
-		insert_dsm(pageid, local_host);
+		insert_dsm(pageid, local_host, dsm);
 		result = 1;
 		return &result;
 	}
@@ -319,7 +193,7 @@ psu_dsm_page_creat_1_svc(pageid_t *argp, struct svc_req *rqstp)
 				mprotect(addr, PAGE_SIZE, PROT_WRITE);
 				memcpy(addr, result_1, PAGE_SIZE);
 		
-				insert_dsm(pageid, server[i]);
+				insert_dsm(pageid, server[i], dsm);
 				result = 1;
 				return &result;
 
@@ -340,7 +214,7 @@ psu_dsm_page_creat_1_svc(pageid_t *argp, struct svc_req *rqstp)
 	new_entry.pbits[idx] = RW;
 	new_entry.mode = RW;
 
-	insert_dir(new_entry);
+	insert_dir(new_entry, dir);
 	
  	key_t key;
 	int shmid;
@@ -355,7 +229,7 @@ psu_dsm_page_creat_1_svc(pageid_t *argp, struct svc_req *rqstp)
 
 	void *addr;
 	addr = shmat(shmid, (void *)0, 0);
-	insert_dsm(pageid, local_host);
+	insert_dsm(pageid, local_host, dsm);
 
 	mprotect(addr, PAGE_SIZE, PROT_WRITE);
 	result = 1;
@@ -369,7 +243,7 @@ psu_dsm_page_update_1_svc(request_t *argp, struct svc_req *rqstp)
 	static int  result;
 	pageid_t pageid = argp->pageid;
 	mode_t mode = argp->mode;
-	dsm_t *dp =search_dsm(pageid);
+	dsm_t *dp =search_dsm(pageid, dsm);
 	if(dp == NULL){
 		perror("no such dsm");
 		exit(1);
@@ -401,7 +275,7 @@ psu_dsm_page_request_1_svc(request_t *argp, struct svc_req *rqstp)
 	mode_t mode;
 
 	pageid = argp->pageid;
-	dir_t *dirp = search_dir(pageid);
+	dir_t *dirp = search_dir(pageid, dir);
 	if(dirp==NULL){
 		perror("no such dir entry");
 		exit(1);
@@ -504,7 +378,7 @@ psu_dsm_page_fetch_1_svc(request_t *argp, struct svc_req *rqstp)
 	pageid_t pageid;
 
 	pageid = argp->pageid;
-	dsm_t *p = search_dsm(pageid);
+	dsm_t *p = search_dsm(pageid, dsm);
 	if(p==NULL){
 		perror("no such memory");
 		exit(1);

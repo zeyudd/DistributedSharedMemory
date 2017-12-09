@@ -13,7 +13,7 @@ psu_dsm_1(char *host)
 	CLIENT *clnt;
 	int  *result_1;
 	pageid_t  psu_dsm_page_find_1_arg;
-	int  *result_2;
+	host_t  *result_2;
 	pageit_T  psu_dsm_page_locate_1_arg;
 	int  *result_3;
 	pageid_t  psu_dsm_page_creat_1_arg;
@@ -39,7 +39,7 @@ psu_dsm_1(char *host)
 		clnt_perror (clnt, "call failed");
 	}
 	result_2 = psu_dsm_page_locate_1(&psu_dsm_page_locate_1_arg, clnt);
-	if (result_2 == (int *) NULL) {
+	if (result_2 == (host_t *) NULL) {
 		clnt_perror (clnt, "call failed");
 	}
 	result_3 = psu_dsm_page_creat_1(&psu_dsm_page_creat_1_arg, clnt);

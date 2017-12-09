@@ -6,6 +6,18 @@
 #include "msg.h"
 
 bool_t
+xdr_host_t (XDR *xdrs, host_t *objp)
+{
+	register int32_t *buf;
+
+	int i;
+	 if (!xdr_vector (xdrs, (char *)objp->ip, IP_LEN,
+		sizeof (char), (xdrproc_t) xdr_char))
+		 return FALSE;
+	return TRUE;
+}
+
+bool_t
 xdr_page_t (XDR *xdrs, page_t *objp)
 {
 	register int32_t *buf;

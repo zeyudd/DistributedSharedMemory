@@ -47,6 +47,6 @@ struct dsm_t{
 typedef struct dsm_t dsm_t;
 
 extern dsm_t *dsm;
-
+extern dsm_t *cdsm;
 
 #endif

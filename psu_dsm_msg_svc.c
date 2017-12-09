@@ -55,7 +55,7 @@ psu_dsm_1(struct svc_req *rqstp, register SVCXPRT *transp)
 
 	case PSU_DSM_PAGE_LOCATE:
 		_xdr_argument = (xdrproc_t) xdr_pageid_t;
-		_xdr_result = (xdrproc_t) xdr_int;
+		_xdr_result = (xdrproc_t) xdr_host_t;
 		local = (char *(*)(char *, struct svc_req *)) psu_dsm_page_locate_1_svc;
 		break;
 

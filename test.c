@@ -1,9 +1,11 @@
 #include "psu_dsm.h"
-
+#include <stdlib.h>
+#include <time.h>
 
 int
 main (int argc, char *argv[])
-{	
+{
+	srand(time(NULL));	
 	psu_dsm_init();
 //	char host[16];
 //	strncpy(host, get_local_ip_addr(), 16);
@@ -32,6 +34,13 @@ main (int argc, char *argv[])
 	
 //	printf("content = %s", ptr);	:wq
 //
+	*((int *)ptr) = rand();
+
+	printf("ptr = %d\n", *((int *)ptr));
+
+	sleep(5);
+
+	printf("ptr = %d\n", *((int *)ptr));
 
 	return 0;
 	

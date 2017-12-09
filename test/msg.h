@@ -17,6 +17,11 @@ extern "C" {
 #define NAME_LEN 32
 #define IP_LEN 16
 
+struct host_t {
+	char ip[IP_LEN];
+};
+typedef struct host_t host_t;
+
 struct page_t {
 	u_int size;
 	char addr[PAGE_SIZE];
@@ -51,8 +56,8 @@ typedef enum mode_t mode_t;
 extern  int * psu_dsm_page_find_1(pageid_t *, CLIENT *);
 extern  int * psu_dsm_page_find_1_svc(pageid_t *, struct svc_req *);
 #define PSU_DSM_PAGE_LOCATE 2
-extern  int * psu_dsm_page_locate_1(pageit_T *, CLIENT *);
-extern  int * psu_dsm_page_locate_1_svc(pageit_T *, struct svc_req *);
+extern  host_t * psu_dsm_page_locate_1(pageit_T *, CLIENT *);
+extern  host_t * psu_dsm_page_locate_1_svc(pageit_T *, struct svc_req *);
 #define PSU_DSM_PAGE_CREAT 3
 extern  int * psu_dsm_page_creat_1(pageid_t *, CLIENT *);
 extern  int * psu_dsm_page_creat_1_svc(pageid_t *, struct svc_req *);
@@ -75,8 +80,8 @@ extern int psu_dsm_1_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
 extern  int * psu_dsm_page_find_1();
 extern  int * psu_dsm_page_find_1_svc();
 #define PSU_DSM_PAGE_LOCATE 2
-extern  int * psu_dsm_page_locate_1();
-extern  int * psu_dsm_page_locate_1_svc();
+extern  host_t * psu_dsm_page_locate_1();
+extern  host_t * psu_dsm_page_locate_1_svc();
 #define PSU_DSM_PAGE_CREAT 3
 extern  int * psu_dsm_page_creat_1();
 extern  int * psu_dsm_page_creat_1_svc();
@@ -98,12 +103,14 @@ extern int psu_dsm_1_freeresult ();
 /* the xdr functions */
 
 #if defined(__STDC__) || defined(__cplusplus)
+extern  bool_t xdr_host_t (XDR *, host_t*);
 extern  bool_t xdr_page_t (XDR *, page_t*);
 extern  bool_t xdr_pageid_t (XDR *, pageid_t*);
 extern  bool_t xdr_request_t (XDR *, request_t*);
 extern  bool_t xdr_mode_t (XDR *, mode_t*);
 
 #else /* K&R C */
+extern bool_t xdr_host_t ();
 extern bool_t xdr_page_t ();
 extern bool_t xdr_pageid_t ();
 extern bool_t xdr_request_t ();

@@ -24,7 +24,7 @@ psu_dsm_page_find_1(pageid_t *argp, CLIENT *clnt)
 	return (&clnt_res);
 }
 
-int *
+host_t *
 psu_dsm_page_locate_1(pageid_t *argp, CLIENT *clnt)
 {
 	static int clnt_res;
@@ -32,7 +32,7 @@ psu_dsm_page_locate_1(pageid_t *argp, CLIENT *clnt)
 	memset((char *)&clnt_res, 0, sizeof(clnt_res));
 	if (clnt_call (clnt, PSU_DSM_PAGE_LOCATE,
 		(xdrproc_t) xdr_pageid_t, (caddr_t) argp,
-		(xdrproc_t) xdr_int, (caddr_t) &clnt_res,
+		(xdrproc_t) xdr_host_t, (caddr_t) &clnt_res,
 		TIMEOUT) != RPC_SUCCESS) {
 		return (NULL);
 	}

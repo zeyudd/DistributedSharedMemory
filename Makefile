@@ -8,7 +8,7 @@ SERVER = server
 
 SOURCES_SVC.c = psu_dsm_msg_svc.c psu_dsm_msg_server.c psu_dsm_msg_xdr.c psu_dsm_msg_clnt.c util.c
 SOURCES_SVC.h = psu_dsm_msg_svc.h util.h
-SOURCES_CLNT.c = psu_dsm_msg_clnt.c psu_dsm.c psu_dsm_msg_xdr.c util.c test.c
+SOURCES_CLNT.c = psu_dsm_msg_clnt.c psu_dsm_msg_server.c psu_dsm.c psu_dsm_msg_xdr.c util.c test.c
 SOURCES_CLNT.h = util.h
 
 OBJECTS_SVC = $(SOURCES_SVC.c:%.c=%.o)
